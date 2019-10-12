@@ -2,16 +2,15 @@ package org.yui.openapi.config;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.yui.base.util.GenericUtil;
 import org.yui.openapi.annotation.OpenApi;
-import org.yui.openapi.bean.AbstractOpenApi;
-import org.yui.openapi.bean.AbstractOpenApiRequest;
-import org.yui.openapi.bean.AbstractOpenApiResponse;
-import org.yui.openapi.bean.OpenApiInfo;
+import org.yui.openapi.bean.*;
 
 import java.util.*;
 
@@ -22,16 +21,12 @@ import java.util.*;
  */
 @Log4j2
 @Configuration
-public class OpenApiConfig implements InitializingBean {
-
-    @Autowired
-    private ApplicationContext applicationContext;
+public class OpenApiConfig implements ApplicationContextAware {
 
     private Set<OpenApiInfo> openApiInfoSet;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         Map<String,AbstractOpenApi> openApiMap = applicationContext.getBeansOfType(AbstractOpenApi.class);
 
         Set<OpenApiInfo> openApiInfoSet0 = new HashSet<>();
@@ -60,7 +55,8 @@ public class OpenApiConfig implements InitializingBean {
         openApiInfoSet = Collections.unmodifiableSet(openApiInfoSet0);
     }
 
-    public Set<OpenApiInfo> getOpenApiInfoSet() {
-        return openApiInfoSet;
+    @Bean
+    public ServletRegistrationBean openApiServlet() {
+        return new ServletRegistrationBean<>(new OpenApiServlet(openApiInfoSet),OpenApiServlet.PATH);
     }
 }

@@ -8,11 +8,9 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 
 /**
- * 由原来阙海林的工程中剥离迁移出来 by zhanglin 20180927
- *
- * 再新增了加16位随机盐值的MD5方法
+ * @author huangjinlong
  */
-public final class MD5Util {
+public abstract class Md5Util {
 
     private static final char[] HEX_DIGITS =
             new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -27,7 +25,7 @@ public final class MD5Util {
      */
     private static final String MD5_STRING = "MD5";
 
-    private MD5Util() {}
+    private Md5Util() {}
 
     public static String getMD5(String s) {
         try {

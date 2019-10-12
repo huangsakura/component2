@@ -8,17 +8,14 @@ import org.yui.base.bean.api.JsonResult;
 import org.yui.base.bean.constant.DocAccessTokenConstant;
 import org.yui.base.bean.constant.StringConstant;
 import org.yui.base.exception.BusinessException;
-import org.yui.base.util.MapUtil;
 import org.yui.filterchain.bean.constant.FilterChainConstant;
 import org.yui.filterchain.config.properties.FilterChainProperties;
-import org.yui.safety.md5.MD5Util;
+import org.yui.safety.md5.Md5Util;
 import org.yui.spring.util.EnvUtil;
-import org.yui.tomcat.bean.constant.TomcatConstant;
 import org.yui.tomcat.bean.filter.wrapper.PutStringToBodyWrapper;
 import org.yui.tomcat.util.ServletResponseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
-import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.core.env.Environment;
 import org.springframework.util.AntPathMatcher;
@@ -30,8 +27,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
@@ -101,13 +96,6 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        boolean isApplicationJson = false;
-        String contentType = request.getContentType();
-        if (StringUtils.isNotBlank(contentType)
-                && contentType.contains(TomcatConstant.CONTENT_TYPE_APPLICATION_JSON)) {
-            isApplicationJson = true;
-        }
-
         /**
          * 判断当前uri是否需要校验接口签名
          */
@@ -116,26 +104,23 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
             return;
         }
 
+        /**
+         * 获取body中的字符串
+         */
+        String bodyString = ServletRequestUtil.getStringFromBody(request);
 
         JSONObject bodyJson = null;
-        if (isApplicationJson) {
-            /**
-             * 获取body中的字符串
-             */
-            String bodyString = ServletRequestUtil.getStringFromBody(request);
-            try {
-                bodyJson = JSONObject.parseObject(bodyString);
-            } catch (Exception e) {
-                logger.error("json:"+bodyString);
-                throw new BusinessException("JSON_PARSE_ERROR", "JSON解析失败",false);
-            }
+        try {
+            bodyJson = JSONObject.parseObject(bodyString);
+        } catch (Exception e) {
+            logger.error("json:"+bodyString);
+            throw new BusinessException("JSON_PARSE_ERROR", "JSON解析失败",false);
         }
 
         /**
          * 获取时间戳
          */
-        String timestamp = getValueFromParameterOrBody(isApplicationJson,
-                request,bodyJson, FilterChainConstant.TIMESTAMP);
+        String timestamp = getValueFromBody(bodyJson, FilterChainConstant.TIMESTAMP);
         if (StringUtils.isBlank(timestamp)) {
             doSthBeforeReturn(FilterChainConstant.TIMESTAMP + "参数缺失",response);
             return;
@@ -144,8 +129,7 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
         /**
          * 获取签名
          */
-        String sign = getValueFromParameterOrBody(isApplicationJson,
-                request,bodyJson,FilterChainConstant.SIGN);
+        String sign = getValueFromBody(bodyJson,FilterChainConstant.SIGN);
         if (StringUtils.isBlank(sign)) {
             doSthBeforeReturn(FilterChainConstant.SIGN + "参数缺失",response);
             return;
@@ -154,8 +138,7 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
         /**
          * 获取随机数字符串
          */
-        String nonce = getValueFromParameterOrBody(isApplicationJson,
-                request,bodyJson,FilterChainConstant.NONCE);
+        String nonce = getValueFromBody(bodyJson,FilterChainConstant.NONCE);
         if (StringUtils.isBlank(nonce) || (nonce.length() < SIGN_NONCE_MIN_LENGTH)) {
             doSthBeforeReturn(FilterChainConstant.NONCE + "参数缺失或长度小于" + SIGN_NONCE_MIN_LENGTH
                     ,response);
@@ -165,8 +148,7 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
         /**
          * 获取app_key
          */
-        String appKey = getValueFromParameterOrBody(isApplicationJson,
-                request,bodyJson,FilterChainConstant.APP_KEY);
+        String appKey = getValueFromBody(bodyJson,FilterChainConstant.APP_KEY);
         if (StringUtils.isBlank(appKey)) {
             doSthBeforeReturn(FilterChainConstant.APP_KEY + "参数缺失",response);
             return;
@@ -176,8 +158,7 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
          * 尝试获取app_secret
          * 如果存在的话，反而是有问题的。不应该传输此参数
          */
-        String appSecret = getValueFromParameterOrBody(isApplicationJson,
-                request,bodyJson,FilterChainConstant.APP_SECRET);
+        String appSecret = getValueFromBody(bodyJson,FilterChainConstant.APP_SECRET);
         if (StringUtils.isNotBlank(appSecret)) {
             doSthBeforeReturn(FilterChainConstant.APP_SECRET + "参数不能传输",response);
             return;
@@ -211,8 +192,7 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
         /**
          * 校验md5
          */
-        RMap<String,Object> rMap = redissonClient.getMap(FilterChainConstant.ABUTMENT_APP_SECRET_REDIS_KEY);
-        appSecret = Optional.ofNullable(rMap.get(appKey)).map(Object::toString).orElse(null);
+        appSecret = RequestInfoHolder.getAppSecret();
 
         if (StringUtils.isBlank(appSecret)) {
             doSthBeforeReturn("根据"+ FilterChainConstant.APP_KEY+"参数的值没有找到对应的应用或appSecret为空"
@@ -221,32 +201,26 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
         }
 
 
-        TreeMap<String,String> stringTreeMap = null;
-        if (isApplicationJson) {
-            stringTreeMap = new TreeMap<>();
-            for (String key : bodyJson.keySet()) {
-                Object object = bodyJson.get(key);
-                if (null != object) {
-                    if ((object instanceof CharSequence) || (object instanceof Number)) {
-                        stringTreeMap.put(key,object.toString());
-                    } else {
-                        if (object instanceof JSONObject) {
-                            JSONObject jsonObject0 = (JSONObject)object;
-                            stringTreeMap.put(key, JSONObject.toJSONString(jsonObject0, SerializerFeature.MapSortField));
-                        } else if (object instanceof JSONArray) {
-                            JSONArray jsonArray0 = (JSONArray)object;
-                            stringTreeMap.put(key, JSONArray.toJSONString(jsonArray0, SerializerFeature.MapSortField));
-                        } else {
-                            stringTreeMap.put(key, JSON.toJSONString(object));
-                        }
-                    }
+        TreeMap<String,String> stringTreeMap = new TreeMap<>();
+        for (String key : bodyJson.keySet()) {
+            Object object = bodyJson.get(key);
+            if (null != object) {
+                if ((object instanceof CharSequence) || (object instanceof Number)) {
+                    stringTreeMap.put(key,object.toString());
                 } else {
-                    stringTreeMap.put(key, null);
+                    if (object instanceof JSONObject) {
+                        JSONObject jsonObject0 = (JSONObject)object;
+                        stringTreeMap.put(key, JSONObject.toJSONString(jsonObject0, SerializerFeature.MapSortField));
+                    } else if (object instanceof JSONArray) {
+                        JSONArray jsonArray0 = (JSONArray)object;
+                        stringTreeMap.put(key, JSONArray.toJSONString(jsonArray0, SerializerFeature.MapSortField));
+                    } else {
+                        stringTreeMap.put(key, JSON.toJSONString(object));
+                    }
                 }
+            } else {
+                stringTreeMap.put(key, null);
             }
-        } else {
-            Map<String,String> stringMap = MapUtil.getStringMap(request.getParameterMap());
-            stringTreeMap = new TreeMap<>(stringMap);
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -267,7 +241,7 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
         String needMd5String = stringBuilder.toString();
         logger.debug("需要被md5散列的字符串是:"+needMd5String);
 
-        String md5 = MD5Util.getMD5(needMd5String);
+        String md5 = Md5Util.getMD5(needMd5String);
         if (!sign.equals(md5)) {
             logger.debug("正确的md5值应该是:" + md5);
             doSthBeforeReturn("签名不匹配，请仔细阅读文档", response);
@@ -278,21 +252,17 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
         /**
          * 如果参数是放到body里面的，则还要把参数返回body中
          */
-        if (isApplicationJson) {
-            /**
-             * 移除业务不需要的参数
-             */
-            bodyJson.remove(FilterChainConstant.SIGN);
-            bodyJson.remove(FilterChainConstant.TIMESTAMP);
-            bodyJson.remove(FilterChainConstant.NONCE);
+        /**
+         * 移除业务不需要的参数
+         */
+        bodyJson.remove(FilterChainConstant.SIGN);
+        bodyJson.remove(FilterChainConstant.TIMESTAMP);
+        bodyJson.remove(FilterChainConstant.NONCE);
 
-            PutStringToBodyWrapper putStringToBodyWrapper =
-                    new PutStringToBodyWrapper(request);
-            putStringToBodyWrapper.setBody(bodyJson.toJSONString());
-            filterChain.doFilter(putStringToBodyWrapper,response);
-        } else {
-            filterChain.doFilter(request,response);
-        }
+        PutStringToBodyWrapper putStringToBodyWrapper =
+                new PutStringToBodyWrapper(request);
+        putStringToBodyWrapper.setBody(bodyJson.toJSONString());
+        filterChain.doFilter(putStringToBodyWrapper,response);
     }
 
 
@@ -325,27 +295,15 @@ public class CheckApiSignFilter extends OncePerRequestFilter {
 
     /**
      *
-     * @param isApplicationJson
-     * @param httpServletRequest
      * @param bodyObject
      * @param keyName
      * @return
      */
-    private static String getValueFromParameterOrBody(boolean isApplicationJson,
-                                                      HttpServletRequest httpServletRequest,
-                                                      JSONObject bodyObject,
-                                                      String keyName) {
+    private static String getValueFromBody(JSONObject bodyObject, String keyName) {
 
-        if (isApplicationJson) {
-            Object object = bodyObject.get(keyName);
-            if (null != object) {
-                String keyValue = object.toString();
-                if (StringUtils.isNotBlank(keyValue)) {
-                    return keyValue;
-                }
-            }
-        } else {
-            String keyValue = httpServletRequest.getParameter(keyName);
+        Object object = bodyObject.get(keyName);
+        if (null != object) {
+            String keyValue = object.toString();
             if (StringUtils.isNotBlank(keyValue)) {
                 return keyValue;
             }

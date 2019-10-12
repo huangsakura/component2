@@ -14,6 +14,5 @@ import org.yui.openapi.bean.AbstractOpenApi;
 public class RegisterApi extends AbstractOpenApi<RegisterRequest, RegisterResponse> {
     @Override
     public void doService(RegisterRequest registerRequest, RegisterResponse registerResponse) {
-
     }
 }

@@ -16,5 +16,13 @@
             <groupId>org.yui</groupId>
             <artifactId>openapi</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.yui</groupId>
+            <artifactId>base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.yui</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
     </dependencies>
 </project>

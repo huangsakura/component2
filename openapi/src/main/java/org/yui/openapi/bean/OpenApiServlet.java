@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.yui.base.bean.api.JsonResult;
 import org.yui.base.bean.constant.StringConstant;
 import org.yui.base.exception.BusinessException;
+import org.yui.base.util.ValidationUtil;
 import org.yui.filterchain.bean.filter.RequestInfoHolder;
 import org.yui.tomcat.util.ServletRequestUtil;
 import org.yui.tomcat.util.ServletResponseUtil;
@@ -25,6 +26,8 @@ import java.util.Set;
  */
 @Log4j2
 public class OpenApiServlet extends HttpServlet {
+
+    public static final String PATH = "/api/*";
 
     private Set<OpenApiInfo> openApiInfoSet;
 
@@ -58,6 +61,7 @@ public class OpenApiServlet extends HttpServlet {
                     if (openApiName.equals(openApiInfo.getName())) {
                         exist = true;
                         AbstractOpenApiRequest abstractOpenApiRequest = JSON.parseObject(body,openApiInfo.getRequest());
+                        ValidationUtil.validate(abstractOpenApiRequest);
                         abstractOpenApiResponse = openApiInfo.getResponse().newInstance();
                         openApiInfo.getOpenApi().doService(abstractOpenApiRequest,abstractOpenApiResponse);
                         break;

@@ -33,6 +33,10 @@ public abstract class RequestInfoHolder {
         private String method;
 
         private String uri;
+
+        private String appKey;
+
+        private String appSecret;
     }
 
     /**
@@ -52,6 +56,28 @@ public abstract class RequestInfoHolder {
         Validate.notBlank(ip);
         Info info = THREAD_LOCAL.get();
         info.setIp(ip);
+        THREAD_LOCAL.set(info);
+    }
+
+    /**
+     *
+     * @param appKey
+     */
+    static void setAppKey(String appKey) {
+        Validate.notBlank(appKey);
+        Info info = THREAD_LOCAL.get();
+        info.setAppKey(appKey);
+        THREAD_LOCAL.set(info);
+    }
+
+    /**
+     *
+     * @param appSecret
+     */
+    static void setAppSecret(String appSecret) {
+        Validate.notBlank(appSecret);
+        Info info = THREAD_LOCAL.get();
+        info.setAppSecret(appSecret);
         THREAD_LOCAL.set(info);
     }
 
@@ -106,6 +132,24 @@ public abstract class RequestInfoHolder {
     public static String getMethod() {
         return Optional.ofNullable(THREAD_LOCAL.get())
                 .map(Info::getMethod).orElse(null);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static String getAppKey() {
+        return Optional.ofNullable(THREAD_LOCAL.get())
+                .map(Info::getAppKey).orElse(null);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static String getAppSecret() {
+        return Optional.ofNullable(THREAD_LOCAL.get())
+                .map(Info::getAppSecret).orElse(null);
     }
 
     /**
