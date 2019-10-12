@@ -3,7 +3,7 @@ package org.yui.base.util;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.*;
 import org.hibernate.validator.constraints.NotBlank;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;

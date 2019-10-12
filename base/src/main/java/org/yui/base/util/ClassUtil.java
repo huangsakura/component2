@@ -3,8 +3,8 @@ package org.yui.base.util;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.validator.constraints.NotBlank;
-import org.yui.base.constant.OtherConstant;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.OtherConstant;
+import org.yui.base.bean.constant.StringConstant;
 import org.yui.base.enums.Enums;
 import sun.awt.OSInfo;
 

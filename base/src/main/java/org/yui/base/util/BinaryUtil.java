@@ -2,7 +2,7 @@ package org.yui.base.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 import org.yui.base.enums.BinaryEnum;
 
 import java.util.ArrayList;

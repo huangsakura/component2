@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import net.sf.cglib.beans.BeanCopier;
 import net.sf.cglib.core.Converter;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;

@@ -13,6 +13,18 @@
         <module>web</module>
         <module>logger</module>
         <module>base</module>
+        <module>aop</module>
+        <module>spring</module>
+        <module>tomcat</module>
+        <module>filter-chain</module>
+        <module>redis</module>
+        <module>thread-pool</module>
+        <module>timer</module>
+        <module>safety</module>
+        <module>expression</module>
+        <module>mybatis</module>
+        <module>DiliApplication</module>
+        <module>openapi</module>
     </modules>
     <name>component</name>
 
@@ -71,6 +83,56 @@
             <dependency>
                 <groupId>org.yui</groupId>
                 <artifactId>base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>aop</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>tomcat</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>timer</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>thread-pool</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>filter-chain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>safety</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>expression</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yui</groupId>
+                <artifactId>openapi</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

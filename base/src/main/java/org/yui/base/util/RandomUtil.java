@@ -2,7 +2,7 @@ package org.yui.base.util;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.Validate;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 import org.yui.base.exception.BusinessException;
 
 import java.io.UnsupportedEncodingException;

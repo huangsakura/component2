@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 import org.yui.base.enums.HttpValidatorEnum;
 import org.yui.base.exception.BusinessException;
 

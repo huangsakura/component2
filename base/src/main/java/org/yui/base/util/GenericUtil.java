@@ -3,14 +3,41 @@ package org.yui.base.util;
 import javax.annotation.Nullable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 /**
  * 泛型工具类
  */
 public abstract class GenericUtil {
 
-    public static Class getGenericClass(final Class clazz) {
+    public static Class getGenericClass(Class clazz) {
         return getGenericClass(clazz, 0);
+    }
+
+    public static Class[] getGenericClasses(Class clazz) {
+
+        /**
+         * 返回直接继承的父类，包含有泛型信息
+         */
+        Type genType = clazz.getGenericSuperclass();
+        if (genType instanceof ParameterizedType) {
+            /**
+             * 进入到这个if条件，说明genType 是含有泛型参数的。
+             * getActualTypeArguments() 方法返回 genType 的泛型类型数组
+             */
+            Type[] params = ((ParameterizedType)genType).getActualTypeArguments();
+            /**
+             * 返回泛型数组里面 index为 (index-1)的类型
+             */
+            if (params != null) {
+                Class[] classes = new Class[params.length];
+                for (int i = 0;i < params.length;i ++) {
+                    classes[i] = (Class)params[i];
+                }
+                return classes;
+            }
+        }
+        return null;
     }
 
     /**
@@ -20,25 +47,15 @@ public abstract class GenericUtil {
      * @return
      */
     @Nullable
-    public static Class getGenericClass(final Class clazz, final int index) {
-        /**
-         * 返回直接继承的父类，包含有泛型信息
-         */
-        final Type genType = clazz.getGenericSuperclass();
-        if (genType instanceof ParameterizedType) {
-            /**
-             * 进入到这个if条件，说明genType 是含有泛型参数的。
-             * getActualTypeArguments() 方法返回 genType 的泛型类型数组
-             */
-            final Type[] params = ((ParameterizedType)genType).getActualTypeArguments();
-            /**
-             * 返回泛型数组里面 index为 (index-1)的类型
-             */
-            if (params != null && params.length > index) {
-                return (Class)params[index];
-            }
-        }
-        return null;
+    public static Class getGenericClass(Class clazz, int index) {
+        return Optional.ofNullable(getGenericClasses(clazz))
+                .map(value0 -> {
+                    if (index < value0.length) {
+                        return value0[index];
+                    } else {
+                        return null;
+                    }
+                }).orElse(null);
     }
 
     /*

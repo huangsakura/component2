@@ -1,8 +1,8 @@
 package org.yui.base.bean.api;
 
+import org.yui.base.annotation.doc.ApiField;
 import lombok.Getter;
 import lombok.Setter;
-import org.yui.base.annotation.doc.ApiField;
 
 import java.io.Serializable;
 
@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-public class JsonResult<T extends Serializable> implements Serializable {
+public class JsonResult<T> implements Serializable {
 
     @ApiField(desc = "返回code",example = "SUCCESS")
     private String code;
@@ -25,6 +25,8 @@ public class JsonResult<T extends Serializable> implements Serializable {
     private T content;
 
     public static final String SUCCESS = "SUCCESS";
+
+    public static final String SUCCESS_MESSAGE = "成功";
 
     public static final String FAIL = "FAIL";
 

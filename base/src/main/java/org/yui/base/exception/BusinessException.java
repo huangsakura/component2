@@ -2,7 +2,7 @@ package org.yui.base.exception;
 
 import lombok.Getter;
 import org.yui.base.enums.Enums;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 
 /**
  * @author huangjinlong

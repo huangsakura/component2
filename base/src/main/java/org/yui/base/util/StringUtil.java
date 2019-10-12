@@ -1,7 +1,7 @@
 package org.yui.base.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 
 import java.util.regex.Pattern;
 

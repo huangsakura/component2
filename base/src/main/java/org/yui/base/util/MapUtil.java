@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 import org.yui.base.enums.Enums;
 
 import javax.annotation.Nullable;

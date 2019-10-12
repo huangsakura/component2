@@ -1,7 +1,7 @@
 package org.yui.base.enums.entity;
 
-import lombok.Getter;
 import org.yui.base.exception.BusinessException;
+import lombok.Getter;
 
 import javax.annotation.Nullable;
 

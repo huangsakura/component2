@@ -1,6 +1,6 @@
 package org.yui.base.annotation.doc;
 
-import org.yui.base.constant.StringConstant;
+import org.yui.base.bean.constant.StringConstant;
 
 import java.lang.annotation.*;
 

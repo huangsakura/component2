@@ -1,10 +1,9 @@
 package org.yui.base.bean.entity;
 
+import org.yui.base.enums.entity.StateEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import org.yui.base.bean.entity.Entitys;
-import org.yui.base.enums.entity.StateEnum;
 
 import javax.annotation.Nullable;
 import javax.persistence.Column;

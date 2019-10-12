@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * @description
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER,ElementType.TYPE,ElementType.METHOD})
+@Target({ElementType.PARAMETER,ElementType.METHOD})
 public @interface PrintLog {
 
     boolean value() default true;

@@ -1,8 +1,8 @@
 package org.yui.base.bean.api;
 
+import org.yui.base.annotation.doc.ApiField;
 import lombok.Getter;
 import lombok.Setter;
-import org.yui.base.annotation.doc.ApiField;
 
 import java.io.Serializable;
 import java.util.List;
