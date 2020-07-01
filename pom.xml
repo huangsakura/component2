@@ -37,7 +37,7 @@
         <hibernate.validator.version>5.3.6.Final</hibernate.validator.version>
         <swagger2.version>2.7.0</swagger2.version>
         <spring.version>4.3.13.RELEASE</spring.version>
-        <quartz.version>2.2.3</quartz.version>
+        <quartz.version>2.3.2</quartz.version>
         <netty.version>4.1.30.Final</netty.version>
     </properties>
 
